@@ -2,23 +2,27 @@ package com.noscendo.authorize.service;
 
 import com.noscendo.authorize.dao.Person;
 import com.noscendo.authorize.repo.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+@AuthorizeReturnObject
+@RequiredArgsConstructor
 @RestController
 public class PersonController {
 
-    @Autowired
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
 
-    @GetMapping(value = "/{name}")
-    public List<Person> findAllByName(String name) {
-        Page<Person> personPage = personRepository.findAllByName(name, PageRequest.ofSize(10));
-        return personPage.getContent();
+    @GetMapping(value = "/authorized/{id}")
+    public Person authorized(@PathVariable Long id) {
+        return personRepository.findById(id).orElseThrow();
+    }
+
+    @GetMapping(value = "/notAuthorized/{id}")
+    public ResponseEntity<Person> notAuthorized(@PathVariable Long id) {
+        return ResponseEntity.ok(personRepository.findById(id).orElseThrow());
     }
 }
