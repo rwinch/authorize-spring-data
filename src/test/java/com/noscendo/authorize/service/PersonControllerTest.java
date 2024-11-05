@@ -19,21 +19,11 @@ class PersonControllerTest {
     }
 
     @Test
-    void authorized() {
+    void read() {
         given()
                 .pathParam("id", 1)
                 .when()
-                .get("/authorized/{id}")
-                .then()
-                .statusCode(403);
-    }
-
-    @Test
-    void notAuthorized() {
-        given()
-                .pathParam("id", 1)
-                .when()
-                .get("/notAuthorized/{id}")
+                .get("/person/{id}")
                 .then()
                 .statusCode(403);
     }
