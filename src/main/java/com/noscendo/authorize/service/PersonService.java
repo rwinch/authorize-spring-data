@@ -4,6 +4,9 @@ import com.noscendo.authorize.model.dao.Person;
 import com.noscendo.authorize.repo.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.Advised;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 // TODO @AuthorizeReturnObject
@@ -19,6 +22,13 @@ public class PersonService {
         Person proxy = personRepository.findById(id).orElseThrow();
         proxy.getId(); // this triggers @PreAuthorize check
         return unwrap(proxy);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public Page<Person> findAllAuthorized(Specification<Person> spec, Pageable pageable) {
+        Page<Person> page = personRepository.findAll(spec, pageable);
+        page.get().map(Person::getId); // this triggers @PreAuthorize check
+        return unwrap(page);
     }
 
     @SuppressWarnings("unchecked")
